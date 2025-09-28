@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta and Title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeDiM</title>
+
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link href="../css/cs.css" rel="stylesheet">
+
+    <!-- Internal Styles -->
+    <style>
+      body {
+        background: #fdfcf9 no-repeat fixed top left;
+        font-family:'DM Mono','Open Sans', sans-serif;
+      }
+      pre {
+        /* Existing styles */
+      }
+      code {
+        /* Existing styles */
+      }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Existing header content -->
+        <div class="container">
+            <h1>Discrete Diffusion Models with MLLMs for Unified Medical Multimodal Generation</h1>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+        
+            <div class="details">
+                <a href="https://github.com/jwmao1" target="_blank">Jiawei Mao</a> <sup>1</sup>,
+                <a href="https://scholar.google.com/citations?user=Bo9xeqMAAAAJ&hl=zh-CN" target="_blank">Yuhan Wang</a> <sup>1</sup>,
+                <a href="https://scholar.google.com/citations?user=o8NyxPIAAAAJ&hl=zh-CN" target="_blank">Lifeng Chen</a> <sup>1</sup>,
+                <a href="https://research.nvidia.com/person/can-zhao" target="_blank">Can Zhao</a> <sup>2</sup>,
+                <a href="https://tangy5.github.io/" target="_blank">Yucheng Tang</a> <sup>2</sup>,
+                <a href="https://research.nvidia.com/person/dong-yang" target="_blank">Dong Yang</a> <sup>2</sup>,
+                <a href="https://liangqiong.github.io/" target="_blank">Liangqiong Qu</a> <sup>3</sup>,
+                <a href="https://daguangxu.net/" target="_blank">Daguang Xu</a> <sup>2</sup>,
+                <a href="https://yuyinzhou.github.io/" target="_blank">Yuyin Zhou</a> <sup>1</sup>
+            </div>
+            <div class="details">
+                <sup>1</sup><a href="https://ucsc-vlaa.github.io/" target="_blank">UC Santa Cruz</a>, 
+                <sup>2</sup><a href="https://research.nvidia.com/research-area/medical" target="_blank">NVIDIA</a>,
+                <sup>3</sup><a href="https://saasweb.hku.hk/" target="_blank">University of Hong Kong</a>
+            </div>
+            <div class="links">
+                <a href="https://github.com/jwmao1/story-adapter" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+                <a href="https://arxiv.org/abs/2410.06244" target="_blank">
+                    <i class="fas fa-file-alt"></i> arXiv
+                </a>
+            </div>
+        </div>
+    </header>
+    <div class="container main">
+        <section class="section section-abstract">
+            <div class="add-div" style="height: 150px;">
+                <img src="images/logo.png" height="150"/>
+            </div>
+            <h2>Abstract</h2>
+            <div class="abs">
+                Advances in generative medical models are often constrained by modality-specific scenarios that hinder the integration of complementary evidence, such as imaging, pathology, and clinical notes. This fragmentation limits their development to true foundation models that empower medical AI agents to learn from and predict across the full spectrum of biomedical knowledge. To address the challenges, we propose <b>MeDiM</b>, the first medical discrete diffusion model that learns shared distributions across different medical modalities without requiring modality-specific components. MeDiM unifies multiple generative tasks: it flexibly translates between images and text or jointly produces image–report pairs across domains in response to user prompts.
+                It builds on a discrete diffusion framework that unifies vision and language modeling by modeling their shared probabilistic distribution. To empower the diffusion process to support unified and versatile medical generation, we employ a multimodal large language model (MLLM) as the diffusion backbone, leveraging its rich prior knowledge and cross-modal reasoning abilities.
+                Because MLLMs are trained with causal (autoregressive) masking while diffusion denoising benefits from bidirectional context, MeDiM introduces two key designs: 1) <i>removing the causal attention mask to enable a fully bidirectional information flow essential for mutual alignment</i>, and 2) <i>injecting continuous timestep embeddings to make the MLLM aware of the diffusion steps</i>. Extensive experiments validate MeDiM as a unified foundation model capable of high-fidelity medical generation across various domains. It achieves high-quality generation on various tasks, including medical image generation (16.60 FID on MIMIC-CXR; 24.19 FID on PathGen) and report generation (0.2650 METEOR on MIMIC-CXR; 0.2580 METEOR on PathGen). In addition, the jointly generated medical pairs improve downstream performance (+6.43% BLEU-1, +18.57% BLEU-2, +31.58% BLEU-3, and +4.80% METEOR in PathGen), which achieves access to multimodal inputs and generate coherent, clinically grounded multimodal outputs.
+            </div>
+        </section>
+
+        <section class="section section-other">
+            <h2>Framework</h2>
+            <div class="abs">
+                <b>Overview of the MeDiM architecture</b>. The framework integrates an MLLM backbone within a discrete diffusion process for unified medical multimodal generation. During the forward process, data is tokenized and diffused over timesteps. The MLLM is then trained to reverse this process. Key architectural adaptations, including causal attention removal, timestep embeddings, and AdaLN, adapt the autoregressive MLLM for the bidirectional denoising required for unified medical generation.
+            </div>
+            <div class="add-div">
+                <img src="images/images/framework.jpg" style="width: 100%;"/>
+            </div>
+        </section>
+
+        <section class="section section-other">
+            <h2>Comparison</h2>
+            <div class="abs">
+                <style>
+  .myred-underline {
+    text-decoration: underline;
+    text-decoration-color: #d32f2f;   /* red */
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+  }
+  .darkgreen-underline {
+    text-decoration: underline;
+    text-decoration-color: #1b5e20;   /* dark green */
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+  }
+</style>
+                <strong>Visual comparison of MeDiM against baselines on three tasks:</strong>
+  (A) medical image generation (unique colors indicate the alignment between the reference report and the images generated by MeDiM),
+  (B) medical report generation (generated report and the reference are highlighted with the same colors for matched content, while incorrect content is highlighted with
+  <span class="myred-underline">red underlines</span>),
+  and (C) joint medical image&ndash;report pair generation (generated report and the prompt are highlighted with the same colors for matched content, with
+  <span class="darkgreen-underline">green underlines</span> denoting additional correct content consistent with the image, and
+  <span class="myred-underline">red underlines</span> marking incorrect content).
+            </div>
+            <div class="add-div">
+                <img src="images/images/qualitive.jpg" style="width: 100%;"/>
+            </div>
+        </section>
+
+           <!-- 修改后的 Regular-length Story Visualization 部分 -->
+        <section class="section section-no-border">
+  <h2>Pathology Image-Report Pair Generation</h2>
+  <div class="carousel-container">
+    <div class="carousel-track">
+      <!-- 原始卡片 -->
+      <div class="card">
+        <img src="images/img_text_pair/image_0.png" alt="Story 1">
+        <p>The tissue displays pleomorphism, hyperchromatic enlarged nuclei, and a high nuclear-to-cytoplasmic ratio with prominent nucleoli, indicating potential malignancy. Areas show dense cellularity, loss of normal stratification, with invasive, atypical cells and stromal invasive squamous cell carcinoma. Moderate inflammatory cells are also present. Keratin pearls confirms a poorly differentiated squamous intraepithelial lesion ( (HSIL), likely an invasive carcinoma. Active mitotic figures confirm rapid cell division a high proliferative index known as a neoplastic condition in the epithelium, along with tissue disorganization features deviates from squamous epithelium, consistent with invasive squamous cell carcinoma. Key findings include include architectural disorder and abnormal mitotic figures, and invasive, atypical cells into fibrous, inflamed stroma, with spindle-shaped cells.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_1.png" alt="Story 2">
+        <p>The renal tissue image displays clear cell renal cell carcinoma (RCC) characterized by cells with clear cytoplasm, round to oval nuclei, prominent nucleoli, and a rich vascular network. The clear cell cytoplasm dissolved in the cytoplasm due to dissolved and eosinophilic and pleomorphism. The tissue architecture is distorted, lacking normal renal structures, suggesting the malignancy, the most common subtype of renal carcinoma. L regions show clear cytoplasm, dissolved due to lipids/carbohydrate accumulation or carbohydrates, and stromal necrosis, significant vascular invasion. These features indicate a renal neuroendocrine subtype of lateral carcinoma, specifically clear cell RCC. Nuclei are visible post-staining, with abundant cytoplasm due to dissolved lipids and unremarkable nuclei. No organized glomeruli or tubules is visible, further support the diagnosis, characterized as renal cell carcinoma or a tubular-inian neoplasm.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_2.png" alt="Story 3">
+        <p>The renal biopsy reveals tubular intraluminal foamy macrophages with vacuolated cytoplasm, indicative of pathology. Accompanying interstitial tissue shows moderate inflammatory in. Tubular atrophy and dilation suggests potential damage. No necrosis. Absence of clear glomeruli further suggest infiltration. These findings point to xantholytic interstitial macrophages or lipid macrophages, potentially associated with lipiduriarelated material and lipid pathology. The findings suggest a renal pathology linked to proteinuria or disease. The glomerular glomerulus suggests an ongoing inflammatory process, likely related to respiratory kidney disorder. Confirmation requires further testing for specific renal pathology. Key pathology include tubular atrophy, interstitial inflammation, and edema in the sinusoids, evidenced by cellularity at the magnification and accompanied by chronic inflammatory response. disease. Tubular lumina are swoled, while the lining are reduced and vacuolization.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_3.png" alt="Story 4">
+        <p>The tissue section shows elongated, spindle-shaped cells with elongated nuclei, typical of smooth muscle cells or fibroblasts, embedded in eosinophilic collagen-rich matrix. The disorganized arrangement and variable cellularity suggest a possible reactive or reparative process, possibly benign myofibroblastic or fibroblastic proliferation, in lung connective tissue. The uniformity in cell size and shape indicates no signs of malignancy. Possible diagnoses include leiomyoma or chronic fibrosis or indicating a well-aligned, myofibroblasticblastic proliferation. There's a benign proliferation of small, dark-staining nuclei suggesting inflammatory cell components or other cells, indicating a well-organized structure. The morphology maintains no evidence of malignancy or tissue disruption,isive of a reactive, active pathological change, possibly idiopath of interstitial lung disease, such as fibrosis.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_4.png" alt="Story 5">
+        <p>The colon tissue image exhibits glandular alterations with crowded, irregularly shaped glands lined by pleomorphic, hyperchromatic columnar epithelial cells, suggesting dysplasia. Varied gus-to-back gland ratio and visible nucleoli are observed. Inflammation, scant stroma, minimal inflammation between epithelial cells, and architectural distortion, indicate a possible neoplastic process. No invasive growth or deep invasion is seen, aligning with a diagnosis of a tubular adenomatous polyp, with possible high-to-mid dysplastic tumor growth. The stroma is moderately cellular. Findings indicate mild regenerative changes without high-grade dysplasia, but if into are not adenomas or adenomarcinoma. The glands vary in volume, however, shows architectural distortion, secretion of left-sided eosinophilic secretions, suggestive of a low-grade malignancy.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_5.png" alt="Story 6">
+        <p>The image displays well-differentiated smooth muscle tissue with spindle-shaped cells in interlacing fascicles and elongated nuclei. The pink-staining cytoplasm indicates eosinophilic filaments. Moderate collagenous extracellular matrix surrounds the cells. There are no signs of inflammation or necrosis, suggesting a sp muscle structure, from the stomach's muscularis propria of the stomach. No hepatocellular architecture is noted. Diagnosis remains uncertain without further tests. No inflammation, necrosis, or significant malignancy is evident; however, the findings suggest non-neoplastic, contraamed, vascular, and muscular tissue, typical of present bladder's pyloric smooth muscle. Ob. The cells feature eosinophilic cytoplasm and eosin staining. The morphology confirms it is detrused histology from the muscularis propria, characteristic of normal skin like the ureter branchium home nut ureter.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_6.png" alt="Story 7">
+        <p>The image displays breast tissue with ductal carcinoma in situ (DCIS). Key features include a proliferative breast epithelial pledingiting hyperchromatic nuclei and high nuclear-to-cytoplasmic ratio, lacking normal architecture. The surrounding stroma shows fibrous tissue, containing inflammatory cells and small vessels. E-cad DCIS features. Confirmation requires further clinical and non-R7 molecular evaluation. These findings are indicative of E-kvasive ductal breast carcinoma, likely the micropapillary subtype of lumen, with characteristics of cells filled within ducts characteristic of mucinous neoplastic, solid. The DCIS architecture is disorganized by the presence of a cribriform pattern. These malignant cells are filled, typical of non-invasive ductal DCIS.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_7.png" alt="Story 8">
+        <p>The tissue image shows dense, irregular cell clusters with hyperchromatic nuclei and prominent nucleoli, suggesting pleomorphism. Scant cytoplasm and a high nuclear-to-cytoplasmic ratio indicate potential invasiveness. Differential diagnosis: endometrial carcinoma. Fibrosis, vascularization, pink stromal material, and inflammatory cells hint at hyperplasia or carcinoma. Compressed glands examined by atypical epithelial cells are noted, but definitive diagnosis requires further testing. The history of endometrial cancer, PR, endometrioid adenal adenocarcinoma, with overall disorganized architecture and pleomorphism, likely support the uterus. The features suggest a high-grade, aggressive, uncontrolled vascularization, cellular proliferation with overcrosing blue-staining stromal cells and absent normal glandular structures. This suggests a diagnosis of adenocinoma, raising concern for endometrial dyslasia postmenopausal bleeding context.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_8.png" alt="Story 9">
+        <p>The tissue sample features spindle-shaped cells with elongated nuclei and moderate eosinophilic cytoplasm, arranged in a fascicular pattern suggestive of mesenchymal origin. Moderate nuclear pleomorphism and collagenous matrix indicate Contrative sarcoma.munistochemical stains ( (kit) Differential diagnoses include an endometrial stromal tumor (GIST) in a renal mass with low maturant superficial myofibroblastic proliferation. Immunohistochemistry with negative epithelial stains for SMA and CD34. I S positivity and S-100, SOX20 are recommended to clarify the morphology for cytokeratin, CK7, S10, Ki-65, and cervix), and adbasal collapse of type B15 (MA (B1). No significant pleomorphism or abnormal mitotic activity, indicating a benign condition linked to an active irritation-differential malignant potential multipleiomatoma diagnosis or benign squamous metaplas tumors.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_9.png" alt="Story 10">
+        <p>The image likely represents a liver biopsy, showing dense connective tissue, numerous hepatocytes with varying nuclear staining, and potential lipid droplets or vacuoles. Hepatocytes like large nuclei with central nucleoli and a trabecular architecture suggest possible pathology. No fibrosis or cirrhosis are evident. Likely liver tissue, possibly fibrosis, inflammation, or neoplastic changes.atoxylin and eosin staining highlights mixed cell nuclei and possible possible Kupffer or or inflammatory cells. No clear clear demarcation of liver pathology or significant inflammation is visible. The presence of congestedusoid hints at fibrosis or cirrhosis; Likely conditions include reactive changes, hyperplasia, steatosis, or heastatic carcinoma. Further data is needed for a definitive diagnosis. The tissue shows a nuclei- oriented structure and the absence of any portal tracts like bile ducts and portal tracts, indicating normal liver histology.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_10.png" alt="Story 11">
+        <p>The lymphoid tissue exhibits a dense infiltrate of small lymphocytes and interspersed atypical cells with prominent nucleoli, suggesting a lymphoproliferative disorder. Lymphoma cells are effaced without normal follicular architecture, fibrous stroma, collagen, and necrosis. Lymphocytes show abundant cytoplasm and smaller cells chromatin chrom. Findings hint at a lymphoproliferative disorder, possibly Hashimoto's in the context of a lymph node mass in a 60-year-ac male with ayminal mass, possible Reed-Sternberg cells, macrophages, autoimmunity, or reactive re blast forms. The lungs are intact, with some signs of atypia. Diagnosis requires more immunohistochemical tests, stain imaging data to differentiate from other reactive or CDic degenerative changes. The findings suggest a lymphoproliferative disorder, possibly reactive lymphocyte or histiytosis.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_11.png" alt="Story 12">
+        <p>The tissue section exhibits severe pleomorphism, hyperchromatic and varied nuclei sizes with prominent nucleoli, and disorganized architecture lacking recognizable structures. Features include eosinophilic cytoplasm, dense cellular cohesion, fibrous connective tissue, and inflammatory infiltration. These findings suggest a diagnosis of a malignant addomy tum process, characterized by atypical cellular morphology, prominent nucleoli, and increased cellular activity proliferation. Possible necrotic debris supports the aggressive tumor behavior and are indicative of poorly differentiated adenocarcinoma or adenocarcinoma. These characteristics primarily display mild to moderate altered colorectal matrix or fibrosis aligning with atypical glandular morphological atypia including cell proliferation and polarity, lacking normal gastrointestinal mucosa with glandular differentiation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-no-border">
+  <h2>Chest X-Ray Image-Report Pair Generation</h2>
+<div class="carousel-container">
+    <div class="carousel-track">
+      <!-- 原始卡片 -->
+      <div class="card">
+        <img src="images/img_text_pair/image_12.png" alt="Story 1">
+        <p>There are moderate-to-severe vascular congestion as well as perihilar opacification on the left than on the right. There is indistinctness of pulmonary vessels, suggestive of small-to-moderate pulmonary edema. There is no pneumomediastinum, a new small-to-moderate right-sided pleural effusion has not changed allowing for somewhat. There is no definite pneumothorax. A dialysis catheter has been removed.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_13.png" alt="Story 2">
+        <p>Severe cardiomegaly is present. Previous mediastinal widening has improved. A region of consolidation, more discrete at the right base and in the left lower lobe, presumably with long-standing infection, is noted. There is increased vascular engorgement. No pulmonary edema is seen. Mediastinal vascular engorgement is present. A dual-channel hemodialysis catheter is at the cavoatrial junction, and atrial node tubes are in place.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_14.png" alt="Story 3">
+        <p>As compared to the previous radiograph, there is pneumonia in the right upper lobe, better visible on the lateral radiograph and moderately dense on the frontal radiograph, appearing more extensive. A newly appeared retrocardiac lung opacity suggests possible re-expansion by a malignancy. A pre-existing lung opacity in the left retrocardiac region has increased substantially. The opacity is likely large, potentially pneumonia in the lateral location. The opacity is confirmed on both the lateral and frontal radiographs, consistent with the clinical presentation.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_15.png" alt="Story 4">
+        <p>The lungs are well expanded and appear clear. Cardiomediastinal silhouette and hilar contours are otherwise unremarkable. No pleural effusion, or pneumonia pneumothorax. IMPRESSION: No acute cardiopulmonary process or evidence of traumatic injury or acute aortic abnormality are. Consider CT to be in etiology and sensitivity for fractures.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_16.png" alt="Story 5">
+        <p>Right central venous catheter terminates in the right atrium. No pneumothorax. Overall low lung volumes are stable. Diffuse right paratracheal and pulmonary mass is better assessed on recent prior chest imaging. No underlying consolidation is identified. Retrocardiac opacity represents atelectasis and may also be secondary to patient rotation and low lung volumes. No pleural effusion or pneumothorax. Left-sided lateral airspace opacities persist which may relate to the known effusions. Mediastinal contours are unremarkable.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_17.png" alt="Story 6">
+        <p>Frontal and lateral views of the chest are obtained. Relative subtle posterior left base linear opacity, best seen on the lateral view, appears similar to scarring. Aside from minimal linear atelectasis/scarring, no scarring is noted. No focal consolidation. No pleural effusion or pneumothorax. The cardiac silhouette is stable. Left humeral costochondral calcifications are noted. No definite pulmonary edema is seen.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_18.png" alt="Story 7">
+        <p>Study is limited due to patient rotation. The heart remains within mild normal limits. Mediastinal contour is stable. The hilar contours are normal. No overt pulmonary edema is demonstrated. Minimal linear opacity within the right lung base is due to subsegmental atelectasis. Low lung volumes are noted with mild elevation of the right hemidiaphragm. No focal consolidation, pleural fluid, or pneumothorax is visualized. Minimal linear opacities in both lung bases are likely atelectasis. Remote right clavicular fracture is noted with associated degenerative changes.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_19.png" alt="Story 8">
+        <p>The lungs are hyperinflated, consistent with COPD. No consolidation or pneumothorax. Linear opacities are seen in the right lower lung, likely due to atelectasis. Streaky opacity within the right lung base is again seen without correlate on the frontal view, possibly representing atelectasis or overlying structures of the right lower lobe. No pneumothorax or pleural effusion is detected. The cardiac silhouette is not enlarged, and mediastinal contours appear within normal limits.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_20.png" alt="Story 9">
+        <p>Patient is status post median sternotomy and aortic valve repair. Cardiac, mediastinal, and hilar contours are stable. Pulmonary vasculature is not substantially changed from the previous interval. Linear opacities within the left lung base may reflect areas of subsegmental atelectasis. Patchy opacities in the lung bases appear increased with areas of atelectasis. No pneumothorax is demonstrated. Bilateral hilar changes may likely be chronic. The aortic knob is calcified.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_21.png" alt="Story 10">
+        <p>PA and lateral chest radiographs demonstrate hyperinflated lungs, suggestive of COPD. Otherwise, there is no focal consolidation, pleural effusion, or pneumothorax. The cardiomediastinal and hilar contours are normal. No acute osseous abnormalities are detected. No acute cardiopulmonary abnormality is present. Postsurgical changes are noted in the upper abdomen.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_22.png" alt="Story 11">
+        <p>FINDINGS: The lungs are hyperinflated but without focal consolidation. No pleural effusion or pneumothorax is seen. The cardiac and mediastinal silhouettes are unremarkable. No pulmonary edema is seen. Bilateral hila are unremarkable. IMPRESSION: Lungs remain hyperinflated, suggesting possible COPD. No focal consolidation is seen.</p>
+      </div>
+      <div class="card">
+        <img src="images/img_text_pair/image_23.png" alt="Story 12">
+        <p>The image is a radiograph of the chest, showing the thoracic cavity structures. Multibibasilar opacities could represent overlap of the apex. No clinical evidence for pneumonia. There are new bilateral infrahilar infiltrates and mild pulmonary edema with flattening of the diaphragmatic contour.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+        <section class="section section-other">
+            <h2>BibTeX</h2>
+            <p><b>
+                If you find our work helpful for your research, please consider giving a citation 📃
+              </b></p>
+            <div class="add-div">
+                <pre><code>
+@misc{mao2024story_adapter,
+  title={{Story-Adapter: A Training-free Iterative Framework for Long Story Visualization}},
+  author={Mao, Jiawei and Huang, Xiaoke and Xie, Yunfei and Chang, Yuanqi and Hui, Mude and Xu, Bingjie and Zhou, Yuyin},
+  journal={arXiv},
+  volume={abs/2410.06244},
+  year={2024},
+}
+                </code></pre>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
